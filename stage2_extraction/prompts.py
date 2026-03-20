@@ -44,9 +44,11 @@ Return this exact JSON structure:
   ]
 }
 
-image_hint must be specific and visual:
+image_hint must be specific, visual, and ALWAYS include the exact product name:
   BAD:  "setup diagram"
-  GOOD: "hands connecting blue water inlet hose to back-left port of washing machine"
+  BAD:  "air fryer on counter" (too generic)
+  GOOD: "hands connecting blue water inlet hose to back-left port of Samsung WW90T washing machine"
+  GOOD: "close-up of KENT Classic Air Fryer 4L temperature dial being turned to 180°C"
 
 Return ONLY valid JSON. No extra text. No markdown fences."""
 
