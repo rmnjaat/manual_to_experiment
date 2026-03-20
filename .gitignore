@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Environment
+.env
+
+# Node
+node_modules/
+frontend/dist/
+remotion-video/node_modules/
+
+# Outputs (generated at runtime)
+outputs/
+temp/
+
+# Backup files
+*.bak
+
+# OS
+.DS_Store
+
+# Reference voice (user-provided)
+assets/reference_voice.wav
