@@ -25,6 +25,33 @@ REQUIRED SPECIAL SCENES:
 - scene_id 1: "What you'll need" — list all prerequisites naturally
 - scene_id 999: Outro — congratulate, brief recap, sign off
 
+VISUAL HINTS (critical for image generation):
+- Every visual_hint MUST mention the EXACT product name (e.g. "KENT Classic Air Fryer 4L")
+- Describe a SPECIFIC physical scene — a real photo that a camera could capture
+- FIRST-PERSON POV: describe the scene as if the viewer is doing the action themselves
+- Show ONLY ONE person's hands (maximum two hands). NEVER describe multiple people or extra hands.
+- Use phrases like "a hand", "the right hand", "one hand holds X while the other turns Y"
+- Include the product in every scene — the viewer should always see the product
+- Use consistent setting: same kitchen counter, same lighting, same angle style
+- BAD:  "air fryer on counter" (too generic, no action)
+- GOOD: "Close-up of the KENT Classic Air Fryer 4L on a wooden kitchen counter, one hand turning the temperature dial to 180°C, first-person POV"
+- BAD:  "hands interacting with the product" (vague, causes duplicate hands)
+- GOOD: "A single right hand lifting the basket out of the KENT Classic Air Fryer 4L, golden crispy french fries visible inside, first-person perspective"
+- BAD:  "pressing the button" (what button? what product? no context)
+- GOOD: "A single finger pressing the power button on top of the KENT Classic Air Fryer 4L, the LED display lighting up, shot from above"
+- For intro: show the product from a 3/4 angle, hero shot, NO hands — just the product
+- For outro: show the product powered on with finished result beside it, NO hands
+
+MOTION HINTS (for enhanced/cinematic video modes):
+- Add a "motion_hint" field describing the PRIMARY MOTION in the scene
+- Focus on what MOVES and HOW: "hand reaches for dial and turns it clockwise 90 degrees"
+- Keep to ONE clear motion per scene — do not describe multiple actions
+- For scenes with no physical interaction: "slow camera pan from left to right across the product"
+- Examples:
+  - "hand lifts the air fryer basket upward and places it on the counter"
+  - "fingers press and hold the power button for 2 seconds, LED lights up"
+  - "hand pours cooking oil into the measuring cup, then tips it into the basket"
+
 SECTION TRANSITIONS:
 - Between sections add a transition scene.
   Example: "Great, setup is done! Now let's look at how to actually use it."
@@ -37,6 +64,7 @@ Return a JSON array:
     "section": null,
     "narration": "...",
     "visual_hint": "...",
+    "motion_hint": "slow camera zoom into the product from wide shot to medium close-up",
     "estimated_duration_sec": 6
   }},
   {{
@@ -44,7 +72,8 @@ Return a JSON array:
     "type": "prerequisites",
     "section": null,
     "narration": "Before we start, here's what you'll need: ...",
-    "visual_hint": "flat lay of all tools and parts needed",
+    "visual_hint": "flat lay of all tools and parts on counter, hands arranging them",
+    "motion_hint": "camera slowly pans across the laid out tools from left to right",
     "estimated_duration_sec": 8
   }},
   {{
@@ -54,6 +83,7 @@ Return a JSON array:
     "step_number": 1,
     "narration": "...",
     "visual_hint": "...",
+    "motion_hint": "hand reaches for the dial and turns it clockwise",
     "estimated_duration_sec": 10
   }},
   {{
@@ -62,6 +92,7 @@ Return a JSON array:
     "section": null,
     "narration": "...",
     "visual_hint": "...",
+    "motion_hint": "slow camera pull-back revealing the finished product on counter",
     "estimated_duration_sec": 5
   }}
 ]
