@@ -7,4 +7,8 @@ class RemotionProvider(VideoProvider):
     """Video rendering using Remotion (local, free, React-based)."""
 
     def render(self, scenes: list[dict], images_dir: str, audio_dir: str, output_path: str, **kwargs) -> str:
-        return _render(scenes, images_dir, audio_dir, output_path)
+        return _render(
+            scenes, images_dir, audio_dir, output_path,
+            quality_mode=kwargs.get("quality_mode", "standard"),
+            videos_dir=kwargs.get("videos_dir", ""),
+        )
