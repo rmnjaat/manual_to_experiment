@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import InputForm from "./components/InputForm";
 import ProgressTracker from "./components/ProgressTracker";
 import ScriptResults from "./components/ScriptResults";
+import OutputView from "./components/OutputView";
 import "./App.css";
 
 const API_URL = "http://localhost:8000";
+const STORAGE_KEY = "pipeline_last_run";
 
 function App() {
+  const [activeTab, setActiveTab] = useState("generate");
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState({});
   const [scenes, setScenes] = useState(null);
@@ -14,6 +17,30 @@ function App() {
   const [metadata, setMetadata] = useState(null);
   const [videoReady, setVideoReady] = useState(false);
   const [error, setError] = useState(null);
+
+  // Load last run from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (saved) {
+        setScenes(saved.scenes || null);
+        setChangelog(saved.changelog || []);
+        setMetadata(saved.metadata || null);
+        setProgress(saved.progress || {});
+        setVideoReady(saved.videoReady || false);
+      }
+    } catch {}
+  }, []);
+
+  // Save to localStorage whenever results change
+  useEffect(() => {
+    if (scenes || Object.keys(progress).length > 0) {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ scenes, changelog, metadata, progress, videoReady })
+      );
+    }
+  }, [scenes, changelog, metadata, progress, videoReady]);
 
   const handleSubmit = async (formData) => {
     setRunning(true);
@@ -55,6 +82,7 @@ function App() {
               setChangelog(msg.result.changelog || []);
               setMetadata(msg.result.metadata || null);
               if (msg.result.video_path) setVideoReady(true);
+              setActiveTab("output");
             } else if (msg.stage === "error") {
               setError(msg.detail);
             } else {
@@ -82,35 +110,48 @@ function App() {
         <p>Upload a product manual, get an instruction video</p>
       </div>
 
-      <InputForm onSubmit={handleSubmit} disabled={running} />
+      <div className="tab-bar">
+        <button
+          className={`tab-btn ${activeTab === "generate" ? "active" : ""}`}
+          onClick={() => setActiveTab("generate")}
+        >
+          Generate
+        </button>
+        <button
+          className={`tab-btn ${activeTab === "output" ? "active" : ""}`}
+          onClick={() => setActiveTab("output")}
+          disabled={!scenes && Object.keys(progress).length === 0}
+        >
+          Output
+        </button>
+      </div>
 
-      {(running || Object.keys(progress).length > 0) && (
-        <ProgressTracker progress={progress} />
+      {activeTab === "generate" && (
+        <>
+          <InputForm onSubmit={handleSubmit} disabled={running} />
+
+          {(running || Object.keys(progress).length > 0) && (
+            <ProgressTracker progress={progress} />
+          )}
+
+          {error && (
+            <div className="error-card">
+              <strong>Error:</strong> {error}
+            </div>
+          )}
+        </>
       )}
 
-      {error && (
-        <div className="error-card">
-          <strong>Error:</strong> {error}
-        </div>
+      {activeTab === "output" && (
+        <OutputView
+          progress={progress}
+          scenes={scenes}
+          changelog={changelog}
+          metadata={metadata}
+          videoReady={videoReady}
+          apiUrl={API_URL}
+        />
       )}
-
-      {videoReady && (
-        <div className="video-card">
-          <h2>
-            Video Ready
-            {metadata && ` — ${metadata.brand || ""} ${metadata.product_name || ""}`}
-          </h2>
-          <a
-            href={`${API_URL}/api/download-video`}
-            className="download-btn"
-            download
-          >
-            Download Video (MP4)
-          </a>
-        </div>
-      )}
-
-      {scenes && <ScriptResults scenes={scenes} changelog={changelog} />}
     </>
   );
 }

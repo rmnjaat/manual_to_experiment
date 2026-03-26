@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 from pipeline import run_pipeline
 from providers import get_registry
 
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
 app = FastAPI(title="Manual → Video Generator")
 

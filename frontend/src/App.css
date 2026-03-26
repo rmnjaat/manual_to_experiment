@@ -16,6 +16,59 @@
   margin-top: 0.3rem;
 }
 
+/* ── Tab Bar ─────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #2a2a2a;
+  padding-bottom: 0.5rem;
+}
+
+.tab-btn {
+  padding: 0.5rem 1.5rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px 8px 0 0;
+  color: #888;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background: #1a1a1a;
+  border-color: #2a2a2a;
+  border-bottom-color: transparent;
+  color: #4f8eff;
+}
+
+.tab-btn:hover:not(.active):not(:disabled) {
+  color: #ccc;
+}
+
+.tab-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ── Output View ─────────────────────────────────────── */
+.output-view {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.output-empty {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 3rem;
+  text-align: center;
+  color: #666;
+}
+
 /* ── Form ────────────────────────────────────────────── */
 .form-card {
   background: #1a1a1a;
@@ -264,6 +317,9 @@
   line-height: 1.5;
   color: #ccc;
   margin-bottom: 0.5rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .scene-visual {

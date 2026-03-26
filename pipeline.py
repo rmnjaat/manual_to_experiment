@@ -28,12 +28,12 @@ from stage2_extraction.enricher import enrich_structure
 from stage3_script.generator import generate_script
 from stage3_script.reviewer import review_script
 from providers import get_registry
-from providers.tts_xtts import XTTSProvider
+from providers.tts_google import GoogleTTSProvider
 from providers.image_imagen import ImagenProvider
 from providers.image_fallback import FallbackSlideProvider
 from providers.video_remotion import RemotionProvider
 
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
 ProgressCallback = Callable[[str, str], None] | None
 
@@ -60,7 +60,7 @@ def _setup_providers(client: genai.Client, provider_config: dict | None = None):
 
     # TTS providers
     if not registry.list_tts():
-        registry.register_tts("xtts_v2", XTTSProvider())
+        registry.register_tts("google_tts", GoogleTTSProvider())
     if "tts" in config:
         registry.set_active_tts(config["tts"])
 

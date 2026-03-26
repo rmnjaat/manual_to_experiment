@@ -5,7 +5,7 @@ from google.genai import types
 from .prompts import EXTRACTION_PROMPT
 
 
-def extract_structure(client: genai.Client, content, model_name: str = "gemini-2.0-flash") -> dict:
+def extract_structure(client: genai.Client, content, model_name: str = "gemini-2.5-flash") -> dict:
     """Send content to Gemini and parse the structured extraction.
 
     Gemini auto-detects product name, brand, and model from the document.

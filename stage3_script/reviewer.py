@@ -12,7 +12,7 @@ def review_script(
     client: genai.Client,
     script: list[dict],
     enriched_data: dict,
-    model_name: str = "gemini-2.0-flash",
+    model_name: str = "gemini-2.5-flash",
 ) -> dict:
     """
     Review the generated script for quality issues and fix them.

@@ -19,7 +19,6 @@ venv:
 install: venv
 	@echo "Installing Python dependencies..."
 	$(PIP) install -r $(PROJECT_DIR)/requirements.txt
-	$(PIP) install google-genai TTS
 	@echo ""
 	@echo "Installing Remotion dependencies..."
 	cd $(PROJECT_DIR)/remotion-video && npm install

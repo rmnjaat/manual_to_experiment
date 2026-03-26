@@ -2,8 +2,47 @@
   {
     "scene_id": 0,
     "type": "intro",
-    "narration": "Placeholder intro scene.",
-    "visual_hint": "product shot",
-    "estimated_duration_sec": 5
+    "section": null,
+    "narration": "Hey there! Welcome to this video on your KENT CLASSIC HOT AIR FRYER 4L. Today, we'll walk you through the basic operation of your new air fryer.",
+    "visual_hint": "close-up of the KENT CLASSIC HOT AIR FRYER 4L on a kitchen counter",
+    "estimated_duration_sec": 13,
+    "real_duration_sec": 11.496
+  },
+  {
+    "scene_id": 1,
+    "type": "prerequisites",
+    "section": null,
+    "narration": "Good news, there are no special tools or parts needed to follow along with this operation guide. Just your air fryer ready to go!",
+    "visual_hint": "the air fryer sitting ready on a clean counter, no extra tools visible",
+    "estimated_duration_sec": 13,
+    "real_duration_sec": 9.648
+  },
+  {
+    "scene_id": 2,
+    "type": "section_transition",
+    "section": "Operation",
+    "narration": "Alright, let's dive into how to operate your air fryer, starting with adjusting the temperature.",
+    "visual_hint": "animated text overlay: 'OPERATION'",
+    "estimated_duration_sec": 9,
+    "real_duration_sec": 7.152
+  },
+  {
+    "scene_id": 3,
+    "type": "step",
+    "section": "Operation",
+    "step_number": 1,
+    "narration": "To adjust the temperature, locate the control knob. Turn it left or right to select your desired heat setting. You can set the temperature between 80 and 200 degrees Celsius.",
+    "visual_hint": "hand rotating a temperature control knob on the front panel of the air fryer",
+    "estimated_duration_sec": 16,
+    "real_duration_sec": 12.984
+  },
+  {
+    "scene_id": 999,
+    "type": "outro",
+    "section": null,
+    "narration": "And that's it! You've successfully learned how to adjust the temperature on your KENT CLASSIC HOT AIR FRYER 4L. Enjoy cooking with your new appliance!",
+    "visual_hint": "KENT CLASSIC HOT AIR FRYER 4L powered on and looking ready to use, with a friendly hand waving goodbye",
+    "estimated_duration_sec": 14,
+    "real_duration_sec": 10.848
   }
 ]

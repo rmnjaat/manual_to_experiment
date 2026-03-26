@@ -5,7 +5,7 @@ from google.genai import types
 from .prompts import SCRIPT_PROMPT
 
 
-def generate_script(client: genai.Client, structure: dict, metadata: dict, model_name: str = "gemini-2.0-flash") -> list[dict]:
+def generate_script(client: genai.Client, structure: dict, metadata: dict, model_name: str = "gemini-2.5-flash") -> list[dict]:
     """Generate scene-by-scene video script.
 
     Args:

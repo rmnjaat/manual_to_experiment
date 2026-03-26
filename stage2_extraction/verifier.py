@@ -12,7 +12,7 @@ def verify_extraction(
     client: genai.Client,
     content,
     structured_data: dict,
-    model_name: str = "gemini-2.0-flash",
+    model_name: str = "gemini-2.5-flash",
 ) -> dict:
     """
     Re-read the original document and verify the extraction is correct and complete.

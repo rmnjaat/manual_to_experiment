@@ -11,7 +11,7 @@ from .validator import parse_gemini_json, validate_enrichment
 def enrich_structure(
     client: genai.Client,
     structured_data: dict,
-    model_name: str = "gemini-2.0-flash",
+    model_name: str = "gemini-2.5-flash",
 ) -> dict:
     """
     Enrich the verified extraction with prerequisites, complexity scores, sub-steps.
