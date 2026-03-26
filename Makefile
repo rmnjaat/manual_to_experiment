@@ -1,11 +1,22 @@
-PYTHON = /opt/anaconda3/envs/video_summary_generator/bin/python
-PIP = /opt/anaconda3/envs/video_summary_generator/bin/pip
-PROJECT_DIR = /Users/ramanjangu/Desktop/VEDIO_SUMMARY_GENERATOR/manual_to_experiment
+PROJECT_DIR = $(shell pwd)
+VENV_DIR = $(PROJECT_DIR)/.venv
+PYTHON = $(VENV_DIR)/bin/python
+PIP = $(VENV_DIR)/bin/pip
 
-.PHONY: install start backend frontend stop clean
+.PHONY: install start backend frontend stop clean venv
+
+## Create venv if it doesn't exist
+venv:
+	@if [ ! -d "$(VENV_DIR)" ]; then \
+		echo "Creating virtual environment..."; \
+		python3 -m venv $(VENV_DIR); \
+		echo "venv created at $(VENV_DIR)"; \
+	else \
+		echo "venv already exists."; \
+	fi
 
 ## Install all dependencies (Python + Node)
-install:
+install: venv
 	@echo "Installing Python dependencies..."
 	$(PIP) install -r $(PROJECT_DIR)/requirements.txt
 	$(PIP) install google-genai TTS
