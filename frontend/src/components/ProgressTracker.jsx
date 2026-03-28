@@ -10,6 +10,8 @@ const STAGES = [
   { key: "stage6", label: "Video Assembly" },
 ];
 
+export { STAGES };
+
 function getStageStatus(stageKey, progress) {
   const doneKey = stageKey + "_done";
   if (progress[doneKey]) return "done";
@@ -24,7 +26,7 @@ function getDetail(stageKey, progress) {
   return "";
 }
 
-export default function ProgressTracker({ progress }) {
+export default function ProgressTracker({ progress, running, onResume }) {
   return (
     <div className="progress-card">
       <h2>Pipeline Progress</h2>
@@ -41,6 +43,15 @@ export default function ProgressTracker({ progress }) {
               <div className="stage-name">{label}</div>
               {detail && <div className="stage-detail">{detail}</div>}
             </div>
+            {!running && status === "done" && onResume && (
+              <button
+                className="resume-btn"
+                onClick={() => onResume(key)}
+                title={`Re-run from ${label}`}
+              >
+                Retry from here
+              </button>
+            )}
           </div>
         );
       })}

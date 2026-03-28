@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import InputForm from "./components/InputForm";
 import ProgressTracker from "./components/ProgressTracker";
-import ScriptResults from "./components/ScriptResults";
 import OutputView from "./components/OutputView";
 import "./App.css";
 
@@ -17,6 +16,8 @@ function App() {
   const [metadata, setMetadata] = useState(null);
   const [videoReady, setVideoReady] = useState(false);
   const [error, setError] = useState(null);
+  const [lastRunId, setLastRunId] = useState(null);
+  const formRef = useRef(null);
 
   // Load last run from localStorage on mount
   useEffect(() => {
@@ -28,6 +29,7 @@ function App() {
         setMetadata(saved.metadata || null);
         setProgress(saved.progress || {});
         setVideoReady(saved.videoReady || false);
+        setLastRunId(saved.lastRunId || null);
       }
     } catch {}
   }, []);
@@ -37,18 +39,13 @@ function App() {
     if (scenes || Object.keys(progress).length > 0) {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ scenes, changelog, metadata, progress, videoReady })
+        JSON.stringify({ scenes, changelog, metadata, progress, videoReady, lastRunId })
       );
     }
-  }, [scenes, changelog, metadata, progress, videoReady]);
+  }, [scenes, changelog, metadata, progress, videoReady, lastRunId]);
 
-  const handleSubmit = async (formData) => {
+  const runPipeline = async (formData) => {
     setRunning(true);
-    setProgress({});
-    setScenes(null);
-    setChangelog([]);
-    setMetadata(null);
-    setVideoReady(false);
     setError(null);
 
     try {
@@ -82,6 +79,7 @@ function App() {
               setChangelog(msg.result.changelog || []);
               setMetadata(msg.result.metadata || null);
               if (msg.result.video_path) setVideoReady(true);
+              if (msg.result.run_id) setLastRunId(msg.result.run_id);
               setActiveTab("output");
             } else if (msg.stage === "error") {
               setError(msg.detail);
@@ -103,6 +101,57 @@ function App() {
     }
   };
 
+  const handleSubmit = async (formData) => {
+    setProgress({});
+    setScenes(null);
+    setChangelog([]);
+    setMetadata(null);
+    setVideoReady(false);
+    formRef.current = formData;
+    await runPipeline(formData);
+  };
+
+  const handleResume = async (stageKey) => {
+    if (!lastRunId || !formRef.current) {
+      setError("Cannot resume — no previous run data. Submit a new run first.");
+      return;
+    }
+    const fd = new FormData();
+    for (const [key, value] of formRef.current.entries()) {
+      fd.append(key, value);
+    }
+    fd.set("resume_run_id", lastRunId);
+    fd.set("resume_from", stageKey);
+    setError(null);
+    await runPipeline(fd);
+  };
+
+  const handleResumeRun = async (runId, stageKey, source) => {
+    setActiveTab("generate");
+    setProgress({});
+    setError(null);
+
+    const fd = formRef.current ? new FormData() : new FormData();
+    // If we have previous form data, copy it
+    if (formRef.current) {
+      for (const [key, value] of formRef.current.entries()) {
+        fd.append(key, value);
+      }
+    }
+    // Set the source from the run if available
+    if (source && !fd.has("url") && !fd.has("pdf") && !fd.has("raw_text")) {
+      if (source.startsWith("http")) {
+        fd.set("url", source);
+      } else {
+        fd.set("raw_text", source);
+      }
+    }
+    fd.set("resume_run_id", runId);
+    fd.set("resume_from", stageKey);
+    setLastRunId(runId);
+    await runPipeline(fd);
+  };
+
   return (
     <>
       <div className="app-header">
@@ -120,7 +169,6 @@ function App() {
         <button
           className={`tab-btn ${activeTab === "output" ? "active" : ""}`}
           onClick={() => setActiveTab("output")}
-          disabled={!scenes && Object.keys(progress).length === 0}
         >
           Output
         </button>
@@ -131,7 +179,11 @@ function App() {
           <InputForm onSubmit={handleSubmit} disabled={running} />
 
           {(running || Object.keys(progress).length > 0) && (
-            <ProgressTracker progress={progress} />
+            <ProgressTracker
+              progress={progress}
+              running={running}
+              onResume={lastRunId ? handleResume : null}
+            />
           )}
 
           {error && (
@@ -143,14 +195,7 @@ function App() {
       )}
 
       {activeTab === "output" && (
-        <OutputView
-          progress={progress}
-          scenes={scenes}
-          changelog={changelog}
-          metadata={metadata}
-          videoReady={videoReady}
-          apiUrl={API_URL}
-        />
+        <OutputView onResumeRun={handleResumeRun} />
       )}
     </>
   );
