@@ -1,6 +1,8 @@
 import { AbsoluteFill, useCurrentFrame, interpolate } from "remotion";
 import { AnimatedSubtitle } from "../components/AnimatedSubtitle";
 import { KenBurnsImage } from "../components/KenBurnsImage";
+import { CrossfadeFrames } from "../components/CrossfadeFrames";
+import { VideoClip } from "../components/VideoClip";
 import { ProgressBar } from "../components/ProgressBar";
 
 interface StepSceneProps {
@@ -12,6 +14,10 @@ interface StepSceneProps {
   stepNumber: number;
   totalSteps: number;
   stepIndex: number;
+  visualType?: "image" | "multiframe" | "video";
+  frameFiles?: string[];
+  videoFile?: string;
+  sceneVariant?: number;
 }
 
 export const StepScene: React.FC<StepSceneProps> = ({
@@ -22,6 +28,10 @@ export const StepScene: React.FC<StepSceneProps> = ({
   stepNumber,
   totalSteps,
   stepIndex,
+  visualType = "image",
+  frameFiles = [],
+  videoFile,
+  sceneVariant = 0,
 }) => {
   const frame = useCurrentFrame();
 
@@ -31,7 +41,14 @@ export const StepScene: React.FC<StepSceneProps> = ({
 
   return (
     <AbsoluteFill>
-      <KenBurnsImage src={imageFile} durationFrames={durationFrames} />
+      {/* Visual layer — adapts to quality mode */}
+      {visualType === "video" && videoFile ? (
+        <VideoClip src={videoFile} durationFrames={durationFrames} fallbackImage={imageFile} />
+      ) : visualType === "multiframe" && frameFiles.length > 1 ? (
+        <CrossfadeFrames frames={frameFiles} durationFrames={durationFrames} variant={sceneVariant} />
+      ) : (
+        <KenBurnsImage src={imageFile} durationFrames={durationFrames} variant={sceneVariant} />
+      )}
 
       {/* Dark gradient overlay */}
       <AbsoluteFill

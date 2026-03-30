@@ -1,6 +1,8 @@
 import { AbsoluteFill, useCurrentFrame, interpolate } from "remotion";
 import { AnimatedSubtitle } from "../components/AnimatedSubtitle";
 import { KenBurnsImage } from "../components/KenBurnsImage";
+import { CrossfadeFrames } from "../components/CrossfadeFrames";
+import { VideoClip } from "../components/VideoClip";
 
 interface OutroSceneProps {
   narration: string;
@@ -8,12 +10,20 @@ interface OutroSceneProps {
   section: string;
   durationFrames: number;
   imageFile: string;
+  visualType?: "image" | "multiframe" | "video";
+  frameFiles?: string[];
+  videoFile?: string;
+  sceneVariant?: number;
 }
 
 export const OutroScene: React.FC<OutroSceneProps> = ({
   narration,
   durationFrames,
   imageFile,
+  visualType = "image",
+  frameFiles = [],
+  videoFile,
+  sceneVariant = 0,
 }) => {
   const frame = useCurrentFrame();
 
@@ -26,7 +36,14 @@ export const OutroScene: React.FC<OutroSceneProps> = ({
 
   return (
     <AbsoluteFill style={{ opacity: fadeOut }}>
-      <KenBurnsImage src={imageFile} durationFrames={durationFrames} />
+      {/* Visual layer */}
+      {visualType === "video" && videoFile ? (
+        <VideoClip src={videoFile} durationFrames={durationFrames} />
+      ) : visualType === "multiframe" && frameFiles.length > 1 ? (
+        <CrossfadeFrames frames={frameFiles} durationFrames={durationFrames} variant={sceneVariant} />
+      ) : (
+        <KenBurnsImage src={imageFile} durationFrames={durationFrames} variant={sceneVariant} />
+      )}
 
       {/* Dark overlay */}
       <AbsoluteFill
