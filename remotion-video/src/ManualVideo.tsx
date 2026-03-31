@@ -1,4 +1,4 @@
-import { AbsoluteFill, Audio, Sequence, staticFile } from "remotion";
+import { AbsoluteFill, Audio, Sequence, staticFile, interpolate, useCurrentFrame } from "remotion";
 import { IntroScene } from "./scenes/IntroScene";
 import { StepScene } from "./scenes/StepScene";
 import { TransitionScene } from "./scenes/TransitionScene";
@@ -9,10 +9,14 @@ interface SceneData {
   type: string;
   narration: string;
   visual_hint: string;
+  motion_hint?: string;
   section?: string;
   step_number?: number;
   estimated_duration_sec: number;
   real_duration_sec?: number;
+  visual_type?: "image" | "multiframe" | "video";
+  frame_count?: number;
+  has_video_clip?: boolean;
 }
 
 interface ManualVideoProps {
@@ -20,7 +24,7 @@ interface ManualVideoProps {
 }
 
 const FPS = 30;
-const TRANSITION_FRAMES = 15;
+const CROSSFADE_FRAMES = 15; // 0.5s crossfade between scenes
 
 export const ManualVideo: React.FC<ManualVideoProps> = ({ scenes }) => {
   let currentFrame = 0;
@@ -33,7 +37,7 @@ export const ManualVideo: React.FC<ManualVideoProps> = ({ scenes }) => {
         const durationFrames = Math.ceil(duration * FPS);
         const startFrame = currentFrame;
 
-        // Advance frame counter (with overlap for transitions)
+        // Advance frame counter
         currentFrame += durationFrames;
 
         // Count which step this is (for progress bar)
@@ -41,15 +45,35 @@ export const ManualVideo: React.FC<ManualVideoProps> = ({ scenes }) => {
           .slice(0, index + 1)
           .filter((s) => s.type === "step").length;
 
+        // Determine visual assets based on quality mode
+        const visualType = scene.visual_type || "image";
+        const frameCount = scene.frame_count || 1;
+
+        // Build frame file paths for multi-frame mode
+        const frameFiles = visualType === "multiframe" && frameCount > 1
+          ? Array.from({ length: frameCount }, (_, i) =>
+              staticFile(`images/scene_${scene.scene_id}_frame_${i}.png`)
+            )
+          : [];
+
+        // Video clip path for cinematic mode
+        const videoFile = visualType === "video" && scene.has_video_clip
+          ? staticFile(`videos/scene_${scene.scene_id}.mp4`)
+          : undefined;
+
+        const imageFile = staticFile(`images/scene_${scene.scene_id}.png`);
+        const audioFile = `audio/scene_${scene.scene_id}.wav`;
+
         const sceneProps = {
           narration: scene.narration,
           visualHint: scene.visual_hint,
           section: scene.section || "",
           durationFrames,
+          visualType,
+          frameFiles,
+          videoFile,
+          sceneVariant: index, // for varied Ken Burns directions
         };
-
-        const audioFile = `audio/scene_${scene.scene_id}.wav`;
-        const imageFile = `images/scene_${scene.scene_id}.png`;
 
         return (
           <Sequence
@@ -61,37 +85,65 @@ export const ManualVideo: React.FC<ManualVideoProps> = ({ scenes }) => {
             {/* Audio track */}
             <Audio src={staticFile(audioFile)} />
 
+            {/* Crossfade overlay from previous scene */}
+            {index > 0 && (
+              <SceneCrossfade durationFrames={durationFrames} />
+            )}
+
             {/* Visual based on scene type */}
             {scene.type === "intro" && (
-              <IntroScene {...sceneProps} imageFile={staticFile(imageFile)} />
+              <IntroScene {...sceneProps} imageFile={imageFile} />
             )}
             {scene.type === "step" && (
               <StepScene
                 {...sceneProps}
-                imageFile={staticFile(imageFile)}
+                imageFile={imageFile}
                 stepNumber={scene.step_number || stepIndex}
                 totalSteps={totalSteps}
                 stepIndex={stepIndex}
               />
             )}
             {scene.type === "transition" && (
-              <TransitionScene {...sceneProps} />
+              <TransitionScene
+                narration={scene.narration}
+                visualHint={scene.visual_hint}
+                section={scene.section || ""}
+                durationFrames={durationFrames}
+              />
             )}
             {scene.type === "prerequisites" && (
               <StepScene
                 {...sceneProps}
-                imageFile={staticFile(imageFile)}
+                imageFile={imageFile}
                 stepNumber={0}
                 totalSteps={totalSteps}
                 stepIndex={0}
               />
             )}
             {scene.type === "outro" && (
-              <OutroScene {...sceneProps} imageFile={staticFile(imageFile)} />
+              <OutroScene {...sceneProps} imageFile={imageFile} />
             )}
           </Sequence>
         );
       })}
     </AbsoluteFill>
+  );
+};
+
+/** Adds a fade-in from black at the start of each scene (crossfade effect) */
+const SceneCrossfade: React.FC<{ durationFrames: number }> = ({ durationFrames }) => {
+  const frame = useCurrentFrame();
+  const fadeIn = interpolate(frame, [0, CROSSFADE_FRAMES], [1, 0], {
+    extrapolateRight: "clamp",
+  });
+
+  return (
+    <AbsoluteFill
+      style={{
+        backgroundColor: "rgba(26, 26, 46, 1)",
+        opacity: fadeIn,
+        zIndex: 100,
+      }}
+    />
   );
 };
